@@ -1,13 +1,12 @@
 # FastDiff
-
-## One Thread, Twenty Million Rows, and the Cost of Verifiability
+## Integrity-First Streaming Reconciliation
 
 **Author:** cxclrfx  
 **Release:** FastDiff v0.2.1  
 **Date:** 25 August 2026  
-**Status:** Independent technical release and reproducible benchmark report
+**Status:** Proprietary technical evidence and reproducible benchmark report
 
-> FastDiff is a local, read-only, evidence-preserving keyed-diff engine for sorted tabular data. It classifies every logical record as `IDENTICAL`, `CHANGED`, `ONLY_A`, or `ONLY_B`, while binding the run to the exact input bytes, comparison semantics, material differences, and final counts.
+> FastDiff is a local, read-only, evidence-preserving keyed-diff engine for sorted tabular data. It classifies every logical record as `IDENTICAL`, `CHANGED`, `ONLY_A`, or `ONLY_B`, while binding [...]
 
 ---
 
@@ -24,7 +23,7 @@ Stopping there would have produced an easy but incomplete conclusion: DuckDB was
 
 We did not stop there.
 
-The inputs were frozen, their hashes were preserved, the output classes were independently reconciled, and the benchmark was decomposed one variable at a time. DuckDB was then measured at 1, 2, 4, 8, and 16 threads. Windows peak working set was measured separately. FastDiff's ordering checks, raw input SHA-256 computation, and per-record UTF-8 validation were isolated through controlled ablations built from the same frozen source.
+The inputs were frozen, their hashes were preserved, the output classes were independently reconciled, and the benchmark was decomposed one variable at a time. DuckDB was then measured at 1, 2, 4,[...]
 
 The full result is not a single winner/loser number. It is a resource-and-evidence map:
 
@@ -37,7 +36,13 @@ The full result is not a single winner/loser number. It is a resource-and-eviden
 - In same-toolchain experimental ablations, removing only raw input SHA-256 reduced FastDiff from **1.058 s to 0.817 s**. Removing per-record UTF-8 validation next reduced it to **0.738 s**.
 - That experimental, non-production path remained non-parallel and landed within **4.55%** of DuckDB at eight threads.
 
-The benchmark therefore answers a more useful question than “which number is smaller?” It shows what each number costs, what each execution actually proves, and where the performance is coming from.
+The benchmark therefore answers a more useful question than "which number is smaller?" It shows what each number costs, what each execution actually proves, and where the performance is coming[...]
+
+---
+
+## About This Repository
+
+FastDiff is a proprietary commercial engineering tool. This public repository contains technical documentation, qualification evidence, reproducible benchmark methodology, measured results, and product-behavior specifications. The production implementation is not published.
 
 ---
 
@@ -45,7 +50,7 @@ The benchmark therefore answers a more useful question than “which number is s
 
 A line-oriented diff is not a keyed data reconciliation engine.
 
-When the same entity remains present under the same key but one field changes, a text diff may describe the event as one deletion and one insertion. For data pipelines, audits, allocations, financial exports, incident evidence, and governance snapshots, the required semantic object is different:
+When the same entity remains present under the same key but one field changes, a text diff may describe the event as one deletion and one insertion. For data pipelines, audits, allocations, financ[...]
 
 ```text
 same key + same payload     -> IDENTICAL
@@ -128,7 +133,7 @@ result counts
 semantic result digest
 ```
 
-This distinction matters throughout the benchmark. DuckDB was used as a strong general-purpose analytical reference, but the count-only SQL query did not perform FastDiff's raw input hashing, sorted/duplicate validation, semantic digest construction, or manifest verification.
+This distinction matters throughout the benchmark. DuckDB was used as a strong general-purpose analytical reference, but the count-only SQL query did not perform FastDiff's raw input hashing, sor[...]
 
 ---
 
@@ -261,14 +266,14 @@ e0e147286976c1ea414281fb693a651566ef58eee43a5b8858fa2f9cbf046f29
 | Storage | Samsung MZVL81T0HELB-00BH1, 1,024,203,640,320 bytes |
 | FastDiff release | v0.2.1 |
 | FastDiff Windows binary SHA-256 | `e77eeb1d24a00aee3aa15351c4fc2988afefb34e2bfbe2e3c47cbc7f5b5dc2dd` |
-| DuckDB | v1.5.5 “Variegata”, commit `d8cdaa33fd` |
+| DuckDB | v1.5.5 "Variegata", commit `d8cdaa33fd` |
 | Go used for controlled ablations | go1.26.7 windows/amd64 |
 
 Normal Windows protections remained enabled. Smart App Control was not disabled to obtain a benchmark result.
 
-### “One thread” terminology
+### "One thread" terminology
 
-FastDiff uses one non-parallel comparison stream: no parallel CSV reader, no worker pool, and no parallel merge path are implemented in `Compare`. The Go runtime may maintain internal operating-system threads, but FastDiff does not distribute the comparison across multiple data-processing workers. DuckDB thread counts were explicitly set to 1, 2, 4, 8, and 16.
+FastDiff uses one non-parallel comparison stream: no parallel CSV reader, no worker pool, and no parallel merge path are implemented in `Compare`. The Go runtime may maintain internal operating-s[...]
 
 ---
 
@@ -353,10 +358,10 @@ FastDiff and DuckDB were alternated where both were measured together, reducing 
 
 Two harness defects were found during the work:
 
-- A PowerShell case-insensitive variable collision replaced the FastDiff executable path with a timing value and produced impossible sub-50 ms “runs.” Every affected number, including a false `23.456x` result, was discarded.
-- A convenience `CountsOK` regex in the memory-scaling harness expected three occurrences of `33333` instead of the correct two. The flag was discarded; query correctness had already been established by direct semantic checks.
+- A PowerShell case-insensitive variable collision replaced the FastDiff executable path with a timing value and produced impossible sub-50 ms "runs." Every affected number, including a false[...]
+- A convenience `CountsOK` regex in the memory-scaling harness expected three occurrences of `33333` instead of the correct two. The flag was discarded; query correctness had already been establi[...]
 
-An experimental result-digest ablation was also not promoted because Windows Application Control blocked one unsigned locally built executable. Windows protection was not weakened to force a result.
+An experimental result-digest ablation was also not promoted because Windows Application Control blocked one unsigned locally built executable. Windows protection was not weakened to force a resu[...]
 
 ---
 
@@ -374,7 +379,7 @@ Warm median             1.4664586 s
 
 The post-reboot first read differed from the warm median by approximately **0.61%** and fell inside the warm-run range.
 
-The label remains deliberately precise: `POST_REBOOT_FIRST_READ`, not “proof of a perfectly empty cold cache.” Windows Defender, indexing, storage firmware, or another background component may touch a file after reboot.
+The label remains deliberately precise: `POST_REBOOT_FIRST_READ`, not "proof of a perfectly empty cold cache." Windows Defender, indexing, storage firmware, or another background component ma[...]
 
 The first-read run nevertheless re-established:
 
@@ -429,7 +434,7 @@ Median:
 17.06 million input rows/s
 ```
 
-Moving from safe mode to a previously qualified trusted-sorted input reduced wall time by **19.73%** and increased throughput by **1.246x**. The comparison counts and semantic result digest remained unchanged.
+Moving from safe mode to a previously qualified trusted-sorted input reduced wall time by **19.73%** and increased throughput by **1.246x**. The comparison counts and semantic result digest remai[...]
 
 Explicit UTF-8 selection versus encoding auto-detection changed the median by only **0.067%**, so encoding detection did not explain the safe-to-trusted improvement.
 
@@ -481,7 +486,7 @@ threads=1, parallel=false          median 2.857929 s
 default threads, parallel=true     median ~0.625 s
 ```
 
-`parallel=true` did not help with only one thread. Multiple threads with serial CSV produced only a modest improvement. The major acceleration appeared when multiple threads and the parallel CSV path were enabled together.
+`parallel=true` did not help with only one thread. Multiple threads with serial CSV produced only a modest improvement. The major acceleration appeared when multiple threads and the parallel CSV [...]
 
 The initial `0.625 s` result was therefore real, but its source was parallel execution—not a superior one-thread keyed-diff path.
 
@@ -510,7 +515,7 @@ xychart-beta
 
 The memory result is as important as the time result.
 
-DuckDB already used about **900 MiB** at one thread. Moving to sixteen threads increased peak working set by about **16.4%**, while reducing wall time by 4.60x. In this workload, most of DuckDB's working-state cost was present before the full 16-thread acceleration.
+DuckDB already used about **900 MiB** at one thread. Moving to sixteen threads increased peak working set by about **16.4%**, while reducing wall time by 4.60x. In this workload, most of DuckDB's[...]
 
 FastDiff occupied a fundamentally different point in the design space:
 
@@ -528,7 +533,7 @@ The conclusion is not that memory is always more important than time. The conclu
 
 ## 12. The measured cost of integrity work
 
-FastDiff deliberately performs work that the count-only DuckDB query did not perform. Controlled ablations measured two of those costs using the same frozen source and the same Go 1.26.7 toolchain.
+FastDiff deliberately performs work that the count-only DuckDB query did not perform. Controlled ablations measured two of those costs using the same frozen source and the same Go 1.26.7 toolchai[...]
 
 ### 12.1 Raw input SHA-256
 
@@ -599,11 +604,11 @@ It is nevertheless informative:
 
 The experimental path was **1.41x faster than DuckDB at four threads** and landed within **4.55%** of DuckDB at eight threads.
 
-No production switch disabling these protections is claimed in v0.2.1. The ablations measure the cost of specific evidence and validation obligations; they do not erase the value of those obligations.
+No production switch disabling these protections is claimed in v0.2.1. The ablations measure the cost of specific evidence and validation obligations; they do not erase the value of those obligat[...]
 
 ### 12.4 What remains unmeasured
 
-The separate cost of result-digest SHA-256 was not promoted. Windows Application Control blocked one unsigned local experimental executable, and the system protection was not disabled. EOL accounting, per-record boundary scanning, and the current `ReadSlice('\n')` architecture also remain candidates for future profiling.
+The separate cost of result-digest SHA-256 was not promoted. Windows Application Control blocked one unsigned local experimental executable, and the system protection was not disabled. EOL accoun[...]
 
 ---
 
@@ -649,7 +654,7 @@ A small, local, read-only, low-memory reconciliation boundary can be inserted in
 - financial or regulatory evidence packages;
 - CI/CD data qualification.
 
-The output is not merely “different.” It explains how the keyed state changed and preserves enough information to reproduce that conclusion later.
+The output is not merely "different." It explains how the keyed state changed and preserves enough information to reproduce that conclusion later.
 
 ```text
 frozen A + frozen B
@@ -870,10 +875,25 @@ The first benchmark number suggested that a general-purpose analytical engine wa
 
 The complete experiment revealed a different structure.
 
-DuckDB earned its lowest raw time through parallel CSV and query execution across many threads and approximately one gigabyte of working state. FastDiff used one non-parallel streaming comparison path, retained raw input identity and semantic result evidence, beat DuckDB at one and two threads, and held peak working set below 28 MiB.
+DuckDB earned its lowest raw time through parallel CSV and query execution across many threads and approximately one gigabyte of working state. FastDiff used one non-parallel streaming comparison[...]
 
 The strongest result is therefore not a slogan about one tool defeating another. It is a demonstrated engineering position:
 
 > **FastDiff delivers keyed, verifiable table reconciliation at high throughput with an exceptionally small and stable resource footprint.**
 
 And because the benchmark decomposed the cost of ordering checks, raw input hashing, encoding validation, thread scaling, and memory, the result is not only fast. It is explainable.
+
+---
+
+## Commercial Evaluation and Licensing
+
+FastDiff is proprietary software.
+
+This public repository documents its externally verifiable behavior, qualification evidence, benchmark methodology, reproducibility protocol, and measured performance without publishing the production implementation.
+
+Commercial evaluation builds, enterprise deployment, integration, and licensing are available directly from the author.
+
+---
+
+| FastDiff | FastReconcile | FastDedup | FastMerge | FastValidate |
+|---|---|---|---|---|
